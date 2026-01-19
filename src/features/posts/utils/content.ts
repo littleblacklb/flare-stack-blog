@@ -43,6 +43,22 @@ export function extractAllImageKeys(doc: JSONContent | null): Array<string> {
   return Array.from(new Set(keys)); // 去重
 }
 
+export function extractCodeLanguages(doc: JSONContent | null): Array<string> {
+  const languages: Set<string> = new Set();
+
+  function traverse(node: JSONContent) {
+    if (node.type === "codeBlock" && node.attrs?.language) {
+      if (node.attrs.language !== "text") {
+        languages.add(node.attrs.language);
+      }
+    }
+    if (node.content) node.content.forEach(traverse);
+  }
+
+  if (doc) traverse(doc);
+  return Array.from(languages);
+}
+
 export function convertToPlainText(doc: JSONContent | null): string {
   if (!doc) return "";
   const textParts: Array<string> = [];
