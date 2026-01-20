@@ -47,8 +47,16 @@ let highlighterPromise: Promise<HighlighterCore> | null = null;
 
 export async function getHighlighter() {
   if (!highlighterPromise) {
+    // Customizing the background color of vitesse-dark to remove the greenish tint
+    // using Zinc-900 (#18181b) to match the dark mode UI
+    const customViteDark = {
+      ...viteDark,
+      bg: "#18181b",
+      name: "vitesse-dark", // Ensure name matches
+    };
+
     highlighterPromise = createHighlighterCore({
-      themes: [viteDark, viteLight],
+      themes: [customViteDark, viteLight],
       langs: [],
       engine: createJavaScriptRegexEngine(),
     });
@@ -88,15 +96,11 @@ export async function highlight(code: string, lang: string) {
 
   const highlighter = await getHighlighter();
   const supportedLangs = highlighter.getLoadedLanguages();
-  // Optimize for plain text or unknown languages to avoid unnecessary highlighter calls/errors
-  if (
-    ["text", "plaintext", "txt"].includes(normalizedLang) ||
-    !supportedLangs.includes(normalizedLang)
-  ) {
-    return `<pre class="shiki text-muted-foreground bg-transparent p-0"><code>${code}</code></pre>`;
-  }
 
-  const safeLang = normalizedLang;
+  // Use safe language fallback but let Shiki handle it
+  const safeLang = supportedLangs.includes(normalizedLang)
+    ? normalizedLang
+    : "text";
 
   try {
     return highlighter.codeToHtml(code, {

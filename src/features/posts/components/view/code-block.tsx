@@ -3,7 +3,38 @@ import { memo, useEffect, useState } from "react";
 import { highlight as highlightCode } from "@/lib/shiki";
 import { useTheme } from "@/components/common/theme-provider";
 
-// 全局高亮缓存
+// Map short codes to display labels
+const LANGUAGE_MAP: Record<string, string> = {
+  ts: "TypeScript",
+  typescript: "TypeScript",
+  js: "JavaScript",
+  javascript: "JavaScript",
+  jsx: "JSX",
+  tsx: "TSX",
+  py: "Python",
+  python: "Python",
+  rb: "Ruby",
+  ruby: "Ruby",
+  go: "Go",
+  rs: "Rust",
+  rust: "Rust",
+  java: "Java",
+  cpp: "C++",
+  c: "C",
+  php: "PHP",
+  css: "CSS",
+  html: "HTML",
+  json: "JSON",
+  yaml: "YAML",
+  xml: "XML",
+  sql: "SQL",
+  sh: "Shell",
+  bash: "Bash",
+  md: "Markdown",
+  text: "Plain Text",
+  txt: "Plain Text",
+};
+
 const highlightCache = new Map<string, string>();
 
 interface CodeBlockProps {
@@ -21,6 +52,11 @@ export const CodeBlock = memo(({ code, language }: CodeBlockProps) => {
   );
 
   const [copied, setCopied] = useState(false);
+
+  // Helper to get display label
+  const displayLanguage = language
+    ? LANGUAGE_MAP[language.toLowerCase()] || language
+    : "Plain Text";
 
   useEffect(() => {
     // If cached, just update state
@@ -71,7 +107,7 @@ export const CodeBlock = memo(({ code, language }: CodeBlockProps) => {
         <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-200/10 dark:border-zinc-800/10 bg-zinc-100 dark:bg-zinc-800 select-none rounded-t-sm">
           <div className="flex items-center gap-4">
             <span className="text-xs font-mono font-medium text-muted-foreground/80">
-              {language || "text"}
+              {displayLanguage}
             </span>
           </div>
 
@@ -91,15 +127,12 @@ export const CodeBlock = memo(({ code, language }: CodeBlockProps) => {
         </div>
 
         {/* Code Area */}
-        <div className="relative p-0 overflow-x-auto custom-scrollbar bg-zinc-50 dark:bg-zinc-900 rounded-b-sm">
-          <div
-            className={`p-6 text-sm font-mono leading-relaxed [&>pre]:bg-transparent! transition-opacity duration-300 ${
-              !language || ["text", "plaintext", "txt"].includes(language)
-                ? "[&_.shiki]:text-muted-foreground [&_span]:text-muted-foreground"
-                : ""
-            }`}
-          >
-            <div dangerouslySetInnerHTML={{ __html: html }} />
+        <div className="relative p-0 overflow-x-auto custom-scrollbar rounded-b-sm">
+          <div className="text-sm font-mono leading-relaxed transition-opacity duration-300">
+            <div
+              className="[&>pre]:p-6 [&>pre]:m-0 [&>pre]:min-w-full [&>pre]:w-fit [&>pre]:rounded-b-sm"
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
           </div>
         </div>
       </div>

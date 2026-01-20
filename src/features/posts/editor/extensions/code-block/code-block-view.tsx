@@ -3,7 +3,11 @@ import { Check, Copy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LANGUAGES } from "./languages";
 import type { NodeViewProps } from "@tiptap/react";
-import { loadLanguage } from "@/lib/shiki";
+import {
+  getHighlighter,
+  loadLanguage,
+  themes as shikiThemes,
+} from "@/lib/shiki";
 import DropdownMenu from "@/components/ui/dropdown-menu";
 
 export function CodeBlockView({
@@ -12,17 +16,35 @@ export function CodeBlockView({
   editor,
 }: NodeViewProps) {
   const [copied, setCopied] = useState(false);
+  const [themeStyles, setThemeStyles] = useState<React.CSSProperties>({});
   const language = node.attrs.language || "text";
 
   useEffect(() => {
     let mounted = true;
-    loadLanguage(language).then(() => {
+
+    // Load language and theme styles
+    const init = async () => {
+      await loadLanguage(language);
+
+      const h = await getHighlighter();
+      const lightTheme = h.getTheme(shikiThemes.light);
+      const darkTheme = h.getTheme(shikiThemes.dark);
+
       if (mounted) {
+        setThemeStyles({
+          "--shiki-light": lightTheme.fg,
+          "--shiki-dark": darkTheme.fg,
+          "--shiki-light-bg": lightTheme.bg,
+          "--shiki-dark-bg": darkTheme.bg,
+        } as React.CSSProperties);
+
         // Trigger re-decoration in shiki plugin
         const tr = editor.state.tr.setMeta("shikiUpdate", true);
         editor.view.dispatch(tr);
       }
-    });
+    };
+
+    init();
 
     return () => {
       mounted = false;
@@ -71,11 +93,16 @@ export function CodeBlockView({
         </div>
 
         {/* Code Area */}
-        <NodeViewContent
-          as="div"
-          className="relative p-6 overflow-x-auto custom-scrollbar text-sm font-mono leading-relaxed outline-none text-muted-foreground [&_.shiki]:text-muted-foreground [&_span]:text-muted-foreground bg-zinc-50 dark:bg-zinc-900 rounded-b-sm"
-          spellCheck={false}
-        />
+        <div
+          className="shiki relative overflow-x-auto custom-scrollbar rounded-b-sm"
+          style={themeStyles}
+        >
+          <NodeViewContent
+            as="div"
+            className="p-6 font-mono text-sm leading-relaxed outline-none min-w-full w-fit"
+            spellCheck={false}
+          />
+        </div>
       </div>
     </NodeViewWrapper>
   );

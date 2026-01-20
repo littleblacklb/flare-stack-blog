@@ -52,18 +52,6 @@ function createDecorationsSync(
         },
       });
 
-      // Add node decoration for background
-      if (tokens.bg || tokens.fg) {
-        const nodeStyle: Record<string, string> = {};
-        if (tokens.fg) nodeStyle["color"] = tokens.fg;
-        decorations.push(
-          Decoration.node(pos, pos + node.nodeSize, {
-            style: styleToString(nodeStyle),
-            class: "shiki",
-          }),
-        );
-      }
-
       // Add inline decorations for each token
       let tokenPos = pos + 1; // +1 to enter the node
       for (const line of tokens.tokens) {
