@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import * as ConfigService from "@/features/config/config.service";
-import { adminMiddleware } from "@/lib/middlewares";
+import { adminMiddleware, dbMiddleware } from "@/lib/middlewares";
 import { SystemConfigSchema } from "@/features/config/config.schema";
 
 export const getSystemConfigFn = createServerFn()
@@ -15,3 +15,7 @@ export const updateSystemConfigFn = createServerFn({
   .handler(({ context, data }) =>
     ConfigService.updateSystemConfig(context, data),
   );
+
+export const getBackgroundConfigFn = createServerFn()
+  .middleware([dbMiddleware])
+  .handler(({ context }) => ConfigService.getBackgroundConfig(context));

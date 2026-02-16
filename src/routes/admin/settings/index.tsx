@@ -9,6 +9,7 @@ import {
   DEFAULT_CONFIG,
   SystemConfigSchema,
 } from "@/features/config/config.schema";
+import { BackgroundSection } from "@/features/config/components/background-section";
 import { EmailServiceSection } from "@/features/email/components/email-service-section";
 import { MaintenanceSection } from "@/features/config/components/maintenance-section";
 import { useSystemSetting } from "@/features/config/hooks/use-system-setting";
@@ -118,6 +119,12 @@ function RouteComponent() {
               服务配置
             </TabsTrigger>
             <TabsTrigger
+              value="appearance"
+              className="w-full md:justify-start justify-center px-3 py-2 rounded-none text-[10px] font-mono uppercase tracking-widest text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-bold transition-all duration-200 border-none shadow-none"
+            >
+              外观设置
+            </TabsTrigger>
+            <TabsTrigger
               value="maintenance"
               className="w-full md:justify-start justify-center px-3 py-2 rounded-none text-[10px] font-mono uppercase tracking-widest text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-bold transition-all duration-200 border-none shadow-none"
             >
@@ -139,6 +146,21 @@ function RouteComponent() {
                 </p>
               </div>
               <EmailServiceSection testEmailConnection={testEmailConnection} />
+            </TabsContent>
+
+            <TabsContent
+              value="appearance"
+              className="mt-0 space-y-6 animate-in fade-in duration-500"
+            >
+              <div className="space-y-1 pb-4 border-b border-border/30">
+                <h2 className="text-xl font-serif font-medium tracking-tight">
+                  外观定制
+                </h2>
+                <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+                  背景图片与视觉效果
+                </p>
+              </div>
+              <BackgroundSection />
             </TabsContent>
 
             <TabsContent

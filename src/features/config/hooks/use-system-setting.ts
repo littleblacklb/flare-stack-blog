@@ -12,6 +12,7 @@ export function useSystemSetting() {
     mutationFn: updateSystemConfigFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CONFIG_KEYS.system });
+      queryClient.invalidateQueries({ queryKey: CONFIG_KEYS.background });
     },
   });
 

@@ -12,6 +12,7 @@ import TanStackQueryDevtools from "@/integrations/tanstack-query/devtools";
 import appCss from "@/styles.css?url";
 import { blogConfig } from "@/blog.config";
 import { clientEnv } from "@/lib/env/client.env";
+import { Background } from "@/components/layout/background";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -96,6 +97,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ThemeProvider>{children}</ThemeProvider>
+        <Background />
         <TanStackDevtools
           config={{
             position: "bottom-right",
