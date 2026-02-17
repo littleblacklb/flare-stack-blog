@@ -18,6 +18,16 @@ export function Background() {
   const transitionDuration =
     config?.transitionDuration ?? DEFAULT_BACKGROUND_CONFIG.transitionDuration!;
 
+  // Preload images
+  useEffect(() => {
+    if (homeUrl) {
+      new Image().src = homeUrl;
+    }
+    if (globalUrl) {
+      new Image().src = globalUrl;
+    }
+  }, [homeUrl, globalUrl]);
+
   // Detect if we're on the homepage
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHomepage = pathname === "/" || pathname === "";
@@ -25,12 +35,10 @@ export function Background() {
   // Scroll-based crossfade ratio (0 = full home image, 1 = full global image)
   const [scrollRatio, setScrollRatio] = useState(0);
 
-  // --- Route transition state ---
-  // Keep the home layer mounted during exit transition so it can fade out
+  // --- Route transition flag ---
+  // Only controls whether CSS transition is active; layers stay always mounted.
   const prevIsHomepageRef = useRef(isHomepage);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  // Animated blend factor: 0 = full home, 1 = full global
-  const [transitionBlend, setTransitionBlend] = useState(isHomepage ? 0 : 1);
+  const [routeTransitioning, setRouteTransitioning] = useState(false);
 
   useEffect(() => {
     const wasHomepage = prevIsHomepageRef.current;
@@ -38,22 +46,15 @@ export function Background() {
 
     if (wasHomepage === isHomepage) return;
 
-    // Route changed — start a crossfade
-    setIsTransitioning(true);
-
-    // On arriving at homepage, reset scroll ratio so we start from the home image
+    // Reset scroll ratio when arriving at homepage
     if (isHomepage) {
       setScrollRatio(0);
     }
 
-    // Kick off the transition on the next frame so the CSS transition fires
-    requestAnimationFrame(() => {
-      setTransitionBlend(isHomepage ? 0 : 1);
-    });
-
-    const timer = setTimeout(() => {
-      setIsTransitioning(false);
-    }, transitionDuration);
+    // Enable CSS transition for the duration of the crossfade.
+    // The browser automatically animates from the old computed opacity to the new one.
+    setRouteTransitioning(true);
+    const timer = setTimeout(() => setRouteTransitioning(false), transitionDuration);
 
     return () => clearTimeout(timer);
   }, [isHomepage, transitionDuration]);
@@ -76,36 +77,19 @@ export function Background() {
 
   if (!enabled || (!globalUrl && !homeUrl)) return null;
 
-  // Show the home layer if we're on the homepage OR still transitioning away
-  const showHomeLayer = (isHomepage || isTransitioning) && !!homeUrl;
-  const showGlobalLayer = !!globalUrl;
+  // Opacity derived directly from current state
+  const homeLayerOpacity = isHomepage ? 1 - scrollRatio : 0;
+  const globalLayerOpacity = isHomepage ? (globalUrl ? scrollRatio : 0) : 1;
 
-  // Compute effective opacities
-  let homeLayerOpacity: number;
-  let globalLayerOpacity: number;
-
-  if (isHomepage && !isTransitioning) {
-    // Normal homepage scroll crossfade
-    homeLayerOpacity = 1 - scrollRatio;
-    globalLayerOpacity = showGlobalLayer ? scrollRatio : 0;
-  } else if (isTransitioning) {
-    // During route transition, blend between home & global using CSS-transitioned value
-    homeLayerOpacity = 1 - transitionBlend;
-    globalLayerOpacity = showGlobalLayer ? transitionBlend : 0;
-  } else {
-    // Not homepage, transition done — full global
-    homeLayerOpacity = 0;
-    globalLayerOpacity = 1;
-  }
-
-  const transitionStyle = isTransitioning
+  // Only apply CSS transition during route changes, not during scroll
+  const transitionStyle = routeTransitioning
     ? `opacity ${transitionDuration}ms ease`
     : "none";
 
   return (
     <div className="fixed inset-0 -z-50 h-full w-full overflow-hidden">
-      {/* Home image layer */}
-      {showHomeLayer && (
+      {/* Home image layer — always mounted so CSS transition works across routes */}
+      {!!homeUrl && (
         <>
           {/* Light mode */}
           <div
@@ -129,7 +113,7 @@ export function Background() {
       )}
 
       {/* Global image layer */}
-      {showGlobalLayer && (
+      {!!globalUrl && (
         <>
           {/* Light mode */}
           <div
