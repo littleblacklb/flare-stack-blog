@@ -115,6 +115,9 @@ export function BackgroundSection() {
   const overlayOpacity =
     watch("background.overlayOpacity") ??
     DEFAULT_BACKGROUND_CONFIG.overlayOpacity!;
+  const transitionDuration =
+    watch("background.transitionDuration") ??
+    DEFAULT_BACKGROUND_CONFIG.transitionDuration!;
 
   return (
     <div className="space-y-16">
@@ -339,6 +342,34 @@ export function BackgroundSection() {
             />
             <p className="text-[10px] font-mono text-muted-foreground/50">
               值越低背景越清晰，值越高文字越易读
+            </p>
+          </div>
+
+          {/* Transition Duration */}
+          <div className="space-y-3 max-w-md">
+            <div className="flex items-center justify-between">
+              <label className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+                切换过渡时长
+              </label>
+              <span className="text-xs font-mono text-foreground tabular-nums">
+                {transitionDuration}ms
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={3000}
+              step={100}
+              value={transitionDuration}
+              onChange={(e) =>
+                setValue("background.transitionDuration", Number(e.target.value), {
+                  shouldDirty: true,
+                })
+              }
+              className="w-full h-1 bg-muted rounded-full appearance-none cursor-pointer accent-foreground"
+            />
+            <p className="text-[10px] font-mono text-muted-foreground/50">
+              页面切换时背景图片淡入淡出的时长 (毫秒)
             </p>
           </div>
         </div>

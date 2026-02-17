@@ -7,6 +7,7 @@ export const BackgroundConfigSchema = z.object({
   darkOpacity: z.number().min(0).max(100).optional(),
   blur: z.number().min(0).max(20).optional(),
   overlayOpacity: z.number().min(0).max(100).optional(),
+  transitionDuration: z.number().min(0).max(5000).optional(),
   enabled: z.boolean().optional(),
 });
 
@@ -19,6 +20,7 @@ export const DEFAULT_BACKGROUND_CONFIG: BackgroundConfig = {
   darkOpacity: 10,
   blur: 1,
   overlayOpacity: 80,
+  transitionDuration: 600,
   enabled: false,
 };
 
