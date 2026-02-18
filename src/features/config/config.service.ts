@@ -1,9 +1,8 @@
-import type { BackgroundConfig, SystemConfig } from "@/features/config/config.schema";
+import type { SystemConfig } from "@/features/config/config.schema";
 import * as CacheService from "@/features/cache/cache.service";
 import * as ConfigRepo from "@/features/config/config.data";
 import {
   CONFIG_CACHE_KEYS,
-  DEFAULT_BACKGROUND_CONFIG,
   SystemConfigSchema,
 } from "@/features/config/config.schema";
 
@@ -16,13 +15,6 @@ export async function getSystemConfig(
     SystemConfigSchema.nullable(),
     async () => await ConfigRepo.getSystemConfig(context.db),
   );
-}
-
-export async function getBackgroundConfig(
-  context: DbContext & { executionCtx: ExecutionContext },
-): Promise<BackgroundConfig> {
-  const config = await getSystemConfig(context);
-  return { ...DEFAULT_BACKGROUND_CONFIG, ...config?.background };
 }
 
 export async function updateSystemConfig(
@@ -38,4 +30,3 @@ export async function updateSystemConfig(
 
   return { success: true };
 }
-

@@ -1,32 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
-import { backgroundConfigQuery } from "@/features/config/queries";
-import { DEFAULT_BACKGROUND_CONFIG } from "@/features/config/config.schema";
+import { blogConfig } from "@/blog.config";
 
 export function Background() {
-  const { data: config } = useQuery(backgroundConfigQuery);
-
-  const enabled = config?.enabled ?? DEFAULT_BACKGROUND_CONFIG.enabled;
-  const globalUrl = config?.imageUrl ?? DEFAULT_BACKGROUND_CONFIG.imageUrl;
-  const homeUrl = config?.homeImageUrl ?? DEFAULT_BACKGROUND_CONFIG.homeImageUrl;
-  const opacity = config?.opacity ?? DEFAULT_BACKGROUND_CONFIG.opacity!;
-  const darkOpacity = config?.darkOpacity ?? DEFAULT_BACKGROUND_CONFIG.darkOpacity!;
-  const blur = config?.blur ?? DEFAULT_BACKGROUND_CONFIG.blur!;
-  const overlayOpacity =
-    config?.overlayOpacity ?? DEFAULT_BACKGROUND_CONFIG.overlayOpacity!;
-  const transitionDuration =
-    config?.transitionDuration ?? DEFAULT_BACKGROUND_CONFIG.transitionDuration!;
-
-  // Preload images
-  useEffect(() => {
-    if (homeUrl) {
-      new Image().src = homeUrl;
-    }
-    if (globalUrl) {
-      new Image().src = globalUrl;
-    }
-  }, [homeUrl, globalUrl]);
+  const {
+    enabled,
+    imageUrl: globalUrl,
+    homeImageUrl: homeUrl,
+    opacity,
+    darkOpacity,
+    blur,
+    overlayOpacity,
+    transitionDuration,
+  } = blogConfig.background;
 
   // Detect if we're on the homepage
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -52,7 +38,6 @@ export function Background() {
     }
 
     // Enable CSS transition for the duration of the crossfade.
-    // The browser automatically animates from the old computed opacity to the new one.
     setRouteTransitioning(true);
     const timer = setTimeout(() => setRouteTransitioning(false), transitionDuration);
 
@@ -69,7 +54,6 @@ export function Background() {
     if (!isHomepage || !homeUrl) return;
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    // Set initial value
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);

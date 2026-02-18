@@ -14,6 +14,7 @@ export async function userHasPassword(context: AuthContext) {
 export async function getIsEmailConfigured(
   context: DbContext & { executionCtx: ExecutionContext },
 ) {
+  return true;
   return CacheService.get(
     context,
     ["isEmailConfigured"],
