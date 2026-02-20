@@ -15,12 +15,12 @@ export const blogConfig = {
   theme: {
     default: {
       background: {
-        homeImage: "", // R2 path or external URL (hero on homepage)
-        globalImage: "", // R2 path or external URL (all other pages + scroll target)
-        light: { opacity: 0.15 }, // opacity in light mode
-        dark: { opacity: 0.1 }, // opacity in dark mode
-        backdropBlur: 8, // px, Gaussian blur
-        transitionDuration: 600, // ms, route crossfade (0-3000)
+        homeImage: env.VITE_DEFAULT_HOME_IMAGE || "", // R2 path or external URL (hero on homepage)
+        globalImage: env.VITE_DEFAULT_GLOBAL_IMAGE || "", // R2 path or external URL (all other pages + scroll target)
+        light: { opacity: env.VITE_DEFAULT_LIGHT_OPACITY || 0.15 }, // opacity in light mode
+        dark: { opacity: env.VITE_DEFAULT_DARK_OPACITY || 0.1 }, // opacity in dark mode
+        backdropBlur: env.VITE_DEFAULT_BACKDROP_BLUR || 8, // px, Gaussian blur
+        transitionDuration: env.VITE_DEFAULT_TRANSITION_DURATION || 600, // ms, route crossfade (0-3000)
       },
     },
     fuwari: {
