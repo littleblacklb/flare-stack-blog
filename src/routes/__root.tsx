@@ -73,24 +73,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           title: "RSS Feed",
           href: "/rss.xml",
         },
-        ...(blogConfig.theme.default.background.homeImage
-          ? [
-              {
-                rel: "preload",
-                as: "image",
-                href: blogConfig.theme.default.background.homeImage,
-              },
-            ]
-          : []),
-        ...(blogConfig.theme.default.background.globalImage
-          ? [
-              {
-                rel: "preload",
-                as: "image",
-                href: blogConfig.theme.default.background.globalImage,
-              },
-            ]
-          : []),
       ],
       scripts: env.VITE_UMAMI_WEBSITE_ID
         ? [
